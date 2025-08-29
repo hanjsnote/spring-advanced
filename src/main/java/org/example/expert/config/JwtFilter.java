@@ -37,7 +37,7 @@ public class JwtFilter implements Filter {
         }
 
         String bearerJwt = httpRequest.getHeader("Authorization");
-
+        System.out.println("=======bearerJwt 값 : " + bearerJwt);
         if (bearerJwt == null) {
             log.warn("인증 헤더 누락: URI={}", url);
             sendErrorResponse(httpResponse, HttpStatus.UNAUTHORIZED, "인증이 필요합니다.");
@@ -45,10 +45,11 @@ public class JwtFilter implements Filter {
         }
 
         String jwt = jwtUtil.substringToken(bearerJwt);
-
+        System.out.println(">>> Filter token = " + jwt);
         try {
             // JWT 유효성 검사와 claims 추출
             Claims claims = jwtUtil.extractClaims(jwt);
+            System.out.println(">>> Filter claims.sub = " + claims.getSubject());
             if (claims == null) {
                 log.warn("Claims 추출 실패: URI={}", url);
                 sendErrorResponse(httpResponse, HttpStatus.UNAUTHORIZED, "인증이 필요합니다.");
@@ -60,6 +61,10 @@ public class JwtFilter implements Filter {
             httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
             httpRequest.setAttribute("email", claims.get("email"));
             httpRequest.setAttribute("userRole", claims.get("userRole"));
+
+            System.out.println(">>> Resolver.userId = " + request.getAttribute("userId"));
+            System.out.println(">>> Resolver.email = " + request.getAttribute("email"));
+            System.out.println(">>> Resolver.role = " + request.getAttribute("userRole"));
 
             if (url.startsWith("/admin") && !UserRole.ADMIN.equals(userRole)) {
                 log.warn("권한 부족: userId={}, role={}, URI={}", claims.getSubject(), userRole, url);
