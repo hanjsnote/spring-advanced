@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,12 +42,11 @@ class ManagerServiceTest {
     public void getManagerListOrThrow() {
         // given
         long todoId = 1L;
-        given(todoRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(todoRepository.findById(todoId)).willReturn(Optional.empty());
 
         // when & then
-//        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId));
-//        assertEquals("Manager not found", exception.getMessage());
-        assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId),"Manager not found");
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class, () -> managerService.getManagers(todoId));
+        assertEquals("Todo not found", exception.getMessage());
     }
 
     @Test
